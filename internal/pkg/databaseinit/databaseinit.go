@@ -62,3 +62,22 @@ func SetDriverName(DriverName string) *DataAccess {
 	}
 	return &db
 }
+
+// func NewStorageContainer(defaultExpiration, cleanupInterval time.Duration) *Cache {
+
+//     // инициализируем карту(map) в паре ключ(string)/значение(Item)
+//     items := make(map[string]Item)
+
+//     cache := Cache{
+//         items:             items,
+//         defaultExpiration: defaultExpiration,
+//         cleanupInterval:   cleanupInterval,
+//     }
+
+//     // Если интервал очистки больше 0, запускаем GC (удаление устаревших элементов)
+//     if cleanupInterval > 0 {
+//         cache.StartGC() // данный метод рассматривается ниже
+//     }
+
+//     return &cache
+// }

@@ -31,12 +31,12 @@ func (c *AuthenticationControllers) AdminSignIn() http.HandlerFunc {
 		var login types.AdminAuth
 
 		json.NewDecoder(r.Body).Decode(&login)
-		ans := c.srv.TestLogin(login)
+		answer := c.srv.TestLogin(login)
 
-		if ans {
-			json.NewEncoder(w).Encode("*Redirect")
+		if answer {
+			json.NewEncoder(w).Encode("*Redirect") ///TODO: Set session cookie
 		} else {
-			w.Write([]byte("ERROR:Wrong Login or Password!"))
+			w.Write([]byte("Неверный пароль или логин"))
 		}
 	}
 }

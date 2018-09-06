@@ -26,8 +26,9 @@ type UserAuth struct {
 	Services          Services `json:SerialNumber`
 }
 
+//!
 type AdminAuth struct {
-	Login        string `json:"Email"`
+	Login        string `json:"Login"`
 	PasswordHash string `json:"PasswordHash"`
 }
 
