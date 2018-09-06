@@ -10,6 +10,7 @@ import (
 	"github.com/AlifElectronicQueue/internal/app/authentication"
 	"github.com/AlifElectronicQueue/internal/app/users"
 	"github.com/AlifElectronicQueue/internal/pkg/databaseinit"
+	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -23,17 +24,42 @@ func main() {
 	DataAccess := databaseinit.SetDriverName(dbProvider)
 	defer DataAccess.Disconnect()
 
-	adRepo := databaseinit.CreateAdminRepository(dbProvider, DataAccess.ConVar)
-	adSrv := admin.InitService(adRepo)
-	adContrl := admin.InitControllers(adSrv)
+	// adRepo := databaseinit.CreateAdminRepository(dbProvider, DataAccess.ConVar)
+	// adSrv := admin.InitService(adRepo)
+	// adContrl := admin.InitControllers(adSrv)
 
 	authRepo := databaseinit.CreateAuthenticationRepository(dbProvider, DataAccess.ConVar)
 	authSrv := authentication.InitService(authRepo)
 	authContrl := authentication.InitControllers(authSrv)
 
-	uRepo := databaseinit.CreateUsersRepository(dbProvider, DataAccess.ConVar)
-	uSrv := users.InitService(uRepo)
-	uContrl := users.InitControllers(uSrv)
+	// uRepo := databaseinit.CreateUsersRepository(dbProvider, DataAccess.ConVar)
+	// uSrv := users.InitService(uRepo)
+	// uContrl := users.InitControllers(uSrv)
+	// router.HandleFunc("/signup", catContrl.AdminSignUp())
+	// router.HandleFunc("/update", catContrl.AdminUpdate())
+	// router.HandleFunc("/delete", catContrl.AdminDelete())
+	
+
+	router := mux.NewServeMux()
+
+	//admin
+	router.HandleFunc("/admin/applications", authContrl.AdminSignIn())
+
+	//Users
+	router.HandleFunc("/v1/login/signin", authContrl.UserSignIn())
+	//router.HandleFunc("/v1/users/catalogue/signup", catContrl.UserSignUp())
+
+	//!**************************************************************************************************************/
+	//? Public Routes
+	//*Root Router
+	router.HandleFunc("/",)
+
+	//*Admin Login Router
+	router.HandleFunc("/login").Methods("POST")
+
+	//?Private Routes
+	//*Admin page Router
+	router.HandleFunc("/admin/applications")
 
 	log.Info("Starting http server...")
 	http.ListenAndServe(":80", router)

@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 
-	"github.com/AlifAcademy/ClientLoyaltyProgram/internal/pkg/types"
+	"github.com/AlifElectronicQueue/internal/pkg/types"
 )
 
 type AuthenticationService struct {
@@ -17,32 +17,23 @@ func InitService(aRep types.IAuthenticationRepository) *AuthenticationService {
 	}
 }
 
-func (srv *AuthenticationService) CheckHashPassword(email, password string) bool {
+func (srv *AuthenticationService) CheckHashPassword(login, password string) bool {
 	h := md5.New()
 	h.Write([]byte(password))
 	newHashPassword := fmt.Sprintf("%x", h.Sum(nil))
 
-	hashPassword := srv.repo.GetHashPassword(email)
+	hashPassword := srv.repo.GetHashPassword(login)
 	return newHashPassword == hashPassword
 }
 
-func (srv *AuthenticationService) CheckHashPasswordSP(email, password string) bool {
-	h := md5.New()
-	h.Write([]byte(password))
-	newHashPassword := fmt.Sprintf("%x", h.Sum(nil))
-
-	hashPassword := srv.repo.GetHashPasswordSP(email)
-	return newHashPassword == hashPassword
-}
-
-func (srv *AuthenticationService) TestLogin(ou types.UserProviderAuthentication) (res bool, usInf types.ServiceProviderDeletePl) {
-	if !srv.repo.EmailCheckSP(ou.Email) {
-		return false, usInf
+func (srv *AuthenticationService) TestLogin(ou types.AdminAuth) (result bool) {
+	if !srv.repo.LoginCheck(ou.Login) {
+		return false
 	}
-	if !srv.CheckHashPasswordSP(ou.Email, ou.Password) {
-		return false, usInf
+	if !srv.CheckHashPassword(ou.Login, ou.Password) {
+		return false
 	}
-	res = true
-	usInf = srv.repo.GetUserInfoSP(ou.Email)
-	return false, usInf
+	result = true
+
+	return
 }

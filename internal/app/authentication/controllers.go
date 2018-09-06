@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/AlifAcademy/ClientLoyaltyProgram/internal/pkg/types"
+	"github.com/AlifElectronicQueue/internal/pkg/types"
 )
 
 type AuthenticationControllers struct {
@@ -17,34 +17,26 @@ func InitControllers(asrv *AuthenticationService) *AuthenticationControllers {
 	}
 }
 
-// TODO Authentication for User
-func (c *AuthenticationControllers) UserSignIn() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		var login types.UserProviderAuthentication
-		json.NewDecoder(r.Body).Decode(&login)
-		ans, usInfo := c.srv.TestLogin(login)
-
-		if ans {
-			json.NewEncoder(w).Encode(usInfo)
-		} else {
-			w.Write([]byte("ERROR:Wrong email or Password"))
-		}
-	}
+//var
+var users = map[string]string{
+	"user1": "password1",
+	"user2": "password2",
 }
 
-// TODO Authentication for ServiceProvider
-func (c *AuthenticationControllers) ServiceProviderSignIn() http.HandlerFunc {
+// TODO Authentication for Admin
+func (c *AuthenticationControllers) AdminSignIn() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		var login types.UserProviderAuthentication
+
+		var login types.AdminAuth
 
 		json.NewDecoder(r.Body).Decode(&login)
-		ans, usInfo := c.srv.TestLogin(login)
-		if ans == true {
-			json.NewEncoder(w).Encode(usInfo)
+		ans := c.srv.TestLogin(login)
+
+		if ans {
+			json.NewEncoder(w).Encode("*Redirect")
 		} else {
-			w.Write([]byte("ERROR:Wrong email or Password"))
+			w.Write([]byte("ERROR:Wrong Login or Password!"))
 		}
 	}
 }
