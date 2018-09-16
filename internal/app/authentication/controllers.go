@@ -32,6 +32,16 @@ var templates = template.Must(template.ParseFiles(
 var key = []byte("super-secret-key")
 var store = sessions.NewCookieStore(key)
 
+func init() {
+
+	store.Options = &sessions.Options{
+		Domain:   "localhost",
+		Path:     "/",
+		MaxAge:   3600 * 24 * 30, // 1 mounth
+		HttpOnly: true,
+	}
+}
+
 func (c *AuthenticationControllers) Application() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		templates.ExecuteTemplate(w, "admin.html", "newusers")
@@ -47,25 +57,24 @@ func (c *AuthenticationControllers) Application() http.HandlerFunc {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		fmt.Println(session.Values["authenticated"])
 		// Print secret message
 		fmt.Fprintln(w, "You have passed!!!")
 
 	}
 }
 
-func initSession(r *http.Request) *sessions.Session {
-	session, err := store.Get(r, "session")
-	if err != nil {
-		fmt.Println("Check initsession")
-	}
-	if session.IsNew {
-		session.Options.Domain = "localhost"
-		session.Options.HttpOnly = false
-		session.Options.Secure = true
-	}
-	return session
-}
+// func initSession(r *http.Request) *sessions.Session {
+// 	session, err := store.Get(r, "session")
+// 	if err != nil {
+// 		fmt.Println("Check initsession")
+// 	}
+// 	if session.IsNew {
+// 		session.Options.Domain = "localhost"
+// 		session.Options.HttpOnly = false
+// 		session.Options.Secure = true
+// 	}
+// 	return session
+// }
 
 func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +98,10 @@ func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 				//*****AUTHENTICATED******//
 
 				//*TODO:SET SESSION
-				session := initSession(r)
+				session, err := store.Get(r, "session")
+				if err != nil {
+					fmt.Println("Check initsession")
+				}
 
 				//*TODO:SET SESSION STATUS
 				session.Values["authenticated"] = true //Authenticated

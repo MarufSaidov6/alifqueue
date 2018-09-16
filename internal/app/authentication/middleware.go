@@ -20,15 +20,15 @@ func (m *AuthenticationMiddleWares) RequiresLogin(handler http.HandlerFunc) http
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		//!DUDE,IT DOES NOT RETURN VALUES!
-		session, _ := store.Get(r, "session") //TODO: Returns a session for the given name after adding it to the registry
-		// if err != nil {
-		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-		// 	return
-		// }
+		session, error := store.Get(r, "session") //TODO: Returns a session for the given name after adding it to the registry
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
 		fmt.Println("Flag middleSESSION!", session) //!
-		session.Values["authenticated"] = true
-		//*CHECKS IF YOU ARE AUTH
+
+		//*FILTER IF YOU ARE AUTH
 		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
