@@ -1,9 +1,6 @@
 package authentication
 
 import (
-	"crypto/md5"
-	"fmt"
-
 	"github.com/AlifElectronicQueue/internal/pkg/types"
 )
 
@@ -17,23 +14,14 @@ func InitService(aRep types.IAuthenticationRepository) *AuthenticationService {
 	}
 }
 
-func (srv *AuthenticationService) CheckHashPassword(login, password string) bool {
-	h := md5.New()
-	h.Write([]byte(password))
-	newHashPassword := fmt.Sprintf("%x", h.Sum(nil))
+func (srv *AuthenticationService) Authenticate(ou types.AdminAuth) (result bool) {
 
-	hashPassword := srv.repo.GetHashPassword(login)
-	return newHashPassword == hashPassword
-}
-
-func (srv *AuthenticationService) TestLogin(ou types.AdminAuth) (result bool) {
-	if !srv.repo.LoginCheck(ou.Login) {
+	if !srv.repo.VerifyLogin(ou.Login) {
 		return false
 	}
-	if !srv.CheckHashPassword(ou.Login, ou.Password) {
+	if !srv.repo.VerifyPasswordHash(ou.Login, ou.PasswordHash) {
 		return false
 	}
-	result = true
 
-	return
+	return true
 }

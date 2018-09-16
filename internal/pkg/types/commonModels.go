@@ -8,6 +8,11 @@ type DBData struct {
 	SSLMode          string `json: "SSLMode"`
 }
 
+// type Server struct {
+// 	router *Routers
+// }
+
+//
 type Services struct {
 	Installment bool `json:"id"`
 	Deposite    bool `json:"id"`
@@ -38,15 +43,15 @@ type Answer struct {
 	Info    interface{} `json:"info"`
 }
 
-type application struct {
+type Application struct {
 	Id          int                `json:"id"`
 	Fio         string             `json:"fullname"`
 	PhoneNumber string             `json:"phoneNumber"`
 	SNumber     string             `json:"serialnumber"`
 	RegDate     string             `json:"regDate"`
-	Services    map[int]appService `json:"services"` // map[id]appServ
+	Services    map[int]AppService `json:"services"` // map[id]appServ
 }
 
-type appService struct {
+type AppService struct {
 	ServiceName string `json:serviceName`
 }

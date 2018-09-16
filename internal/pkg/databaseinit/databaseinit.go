@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/AlifAcademy/ClientLoyaltyProgram/internal/pkg/types"
+	"github.com/AlifElectronicQueue/internal/pkg/types"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -17,6 +17,7 @@ type DataAccess struct {
 	DriverName     string
 }
 
+//
 func (db *DataAccess) InitDataBase() error {
 	var dbData types.DBData
 	slbyte, _ := ioutil.ReadFile(db.ConfigFilePath)
@@ -25,8 +26,9 @@ func (db *DataAccess) InitDataBase() error {
 	if err != nil {
 		return errors.New("Can not decode from JSON file!")
 	}
-	dbInfo := dbData.DataBaseUser + `://` + dbData.DataBaseUser + `:` + dbData.DataBasePassword + `@192.168.202.10/` + dbData.DataBaseName
-	db.ConVar = sqlx.MustConnect("postgres", dbInfo)
+	//dbInfo := dbData.DataBaseUser + `://` + dbData.DataBaseUser + `:` + dbData.DataBasePassword + `@127.0.0.1/` + dbData.DataBaseName + " sslmode=disable"
+	dn := "user=postgres password=tomatotime1 dbname=alifqueue sslmode=disable"
+	db.ConVar = sqlx.MustConnect("postgres", dn)
 
 	if err = db.ConVar.Ping(); err != nil {
 		return err
@@ -47,7 +49,7 @@ func (db *DataAccess) GetDriverName() string {
 
 func SetDriverName(DriverName string) *DataAccess {
 	var db = DataAccess{
-		ConfigFilePath: "../../configs/dbDataAccess.json",
+		ConfigFilePath: "./configs/dbDataAccess.json",
 		DriverName:     DriverName,
 	}
 	switch DriverName {

@@ -1,7 +1,7 @@
 {
-    "driverName": "",
-    "DataBaseUser": "",
-    "DataBaseName": "",
-    "DataBasePassword": "",
+    "driverName": "postgres",
+    "DataBaseUser": "postgres",
+    "DataBaseName": "alifqueue",
+    "DataBasePassword": "tomatotime1",
     "sslMode": "disable"
 }
