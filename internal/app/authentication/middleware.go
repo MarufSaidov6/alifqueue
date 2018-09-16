@@ -20,7 +20,7 @@ func (m *AuthenticationMiddleWares) RequiresLogin(handler http.HandlerFunc) http
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		//!DUDE,IT DOES NOT RETURN VALUES!
-		session, error := store.Get(r, "session") //TODO: Returns a session for the given name after adding it to the registry
+		session, err := store.Get(r, "session") //TODO: Returns a session for the given name after adding it to the registry
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
