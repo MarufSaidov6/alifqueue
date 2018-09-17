@@ -59,6 +59,7 @@ func (c *AuthenticationControllers) Application() http.HandlerFunc {
 		}
 		// Print secret message
 		fmt.Fprintln(w, "You have passed!!!")
+		//TODO:Show list of orders
 
 	}
 }
@@ -127,7 +128,7 @@ func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 				http.Redirect(w, r, "/admin/applications", 302)
 
 			} else {
-				http.Redirect(w, r, "/login", http.StatusUnauthorized)
+				http.Redirect(w, r, "/login", 302)
 
 			}
 		}
@@ -137,13 +138,8 @@ func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 func (c *AuthenticationControllers) AdminLogout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Set("Content-Type", "application/json")
-
 		session, _ := store.Get(r, "session")
 		//Only Post Method
-		if r.Method != "POST" {
-			http.NotFound(w, r)
-		}
 
 		// Revoke users authentication
 		session.Values["authenticated"] = false
