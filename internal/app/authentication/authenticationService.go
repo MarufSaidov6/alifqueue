@@ -1,6 +1,9 @@
 package authentication
 
 import (
+	"strings"
+	"time"
+
 	"github.com/AlifElectronicQueue/internal/pkg/types"
 )
 
@@ -13,6 +16,35 @@ func InitService(aRep types.IAuthenticationRepository) *AuthenticationService {
 		repo: aRep,
 	}
 }
+
+//
+func (srv *AuthenticationService) CreateUser(user types.UserAuth) error {
+	//TODO: ADD TIME
+	layout := "2006-01-02"
+	currentTime := time.Now()
+	user.RegistrationDate = currentTime.Format(layout)
+
+	//TODO: ADD PURCHASEDATE
+	user.PurchaseDateTime = currentTime.Add(time.Hour * 24 * 3).Format(layout)
+
+	//!VALIDATION PROCESS!!!
+	//TODO: "A" may be cyrillic!
+	xbytes := []rune(user.SerialNumber)
+	xbytes[0] = 'A'
+	user.SerialNumber = string(xbytes)
+	//TODO: Parse Phone number
+	user.Contact = strings.Replace(user.Contact, " ", "", -1)
+	//!/
+
+	//TODO:INSERT USER INTO DB
+	err := srv.repo.InsertUser(user)
+	return err
+}
+
+// func (srv *AuthenticationService) UpdateUserStatus(users types.GetUsers) error {
+// 	err := srv.repo.UpdateUserStatus(users.Checked, users.Id)
+// 	return err
+// }
 
 func (srv *AuthenticationService) Authenticate(ou types.AdminAuth) (result bool) {
 

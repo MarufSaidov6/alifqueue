@@ -8,30 +8,35 @@ type DBData struct {
 	SSLMode          string `json: "SSLMode"`
 }
 
-// type Server struct {
-// 	router *Routers
-// }
-
-//
+//!STORE USER
+type UserAuth struct {
+	Id               int      `json:"id"`
+	FullName         string   `json:"FIO"`
+	Contact          string   `json:"Contact"`
+	SerialNumber     string   `json:"SerialNumber"`
+	RegistrationDate string   `json:"Registrationdate"`
+	PurchaseDateTime string   `json:"PurchaseDateTime"`
+	Services         Services `json:"Services"`
+}
 type Services struct {
-	Installment bool `json:"id"`
-	Deposite    bool `json:"id"`
-	CreditCard  bool `json:"id"`
-	UsingApi    bool `json:"id"`
-	None        bool `json:"id"`
+	Installment bool `json:"nasiya"`
+	Deposite    bool `json:"Installment"`
+	CreditCard  bool `json:"CreditCard"`
+	UsingApi    bool `json:"UsingApi"`
+	None        bool `json:"None"`
 }
 
-type UserAuth struct {
-	Id                int    `json:"id"`
-	RegistrationDate  string `json:"Registration_date"`
-	FullName          string `json:"Name"`
-	Contacts          string `json:"Contacts"`
-	SerialNumber      string `json:SerialNumber`
-	Registration_date string
-	Services          Services `json:SerialNumber`
+//!GET USERS
+type GetUsers struct {
+	FullName         string `json:"FullName"`
+	Contact          string `json:"Contact"`
+	SerialNumber     string `json:"SerialNumber"`
+	PurchaseDateTime string `json:"PurchaseDateTime"`
+	Сhecked          bool   `json:"Checked"` //!ATTENTION!
 }
 
 //!
+
 type AdminAuth struct {
 	Login        string `json:"Login"`
 	PasswordHash string `json:"PasswordHash"`

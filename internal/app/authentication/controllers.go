@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -44,22 +45,14 @@ func init() {
 
 func (c *AuthenticationControllers) Application() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		templates.ExecuteTemplate(w, "admin.html", "newusers")
-		session, err := store.Get(r, "session")
-		fmt.Println("store", store)
-		if err != nil {
 
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		// Print secret message
-		fmt.Fprintln(w, "You have passed!!!")
 		//TODO:Show list of orders
+		var data types.UserAuth
+		err := json.NewDecoder(r.Body).Decode(&data)
+		err = c.srv.CreateUser(data)
+		if err != nil {
+			//		panic(err)
+		}
 
 	}
 }
@@ -76,6 +69,77 @@ func (c *AuthenticationControllers) Application() http.HandlerFunc {
 // 	}
 // 	return session
 // }
+func (c *AuthenticationControllers) SelectUsers() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// w.Header().Set("Content-Type", "application/json")
+
+		//templates.ExecuteTemplate(w, "admin.html", "newusers")
+		session, err := store.Get(r, "session")
+		fmt.Println("store", store)
+		if err != nil {
+
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		users, err := c.srv.repo.GetPersons()
+		fmt.Println("check,", users)
+		if err != nil {
+			fmt.Println("Smth wrong in conntr->", err)
+		}
+		err = templates.ExecuteTemplate(w, "admin.html", users)
+		if err != nil {
+			fmt.Println(err)
+		}
+		//err = json.NewEncoder(w).Encode(users)
+		// if err != nil {
+		// 	panic(err)
+		// }
+	}
+}
+
+// func (c *AuthenticationControllers) Update() http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		w.Header().Set("Content-Type", "application/json")
+// 		var (
+// 			user   types.GetUsers
+// 			answer types.Answer
+// 		)
+// 		if r.Method != http.MethodPut {
+// 			answer.Code = http.StatusMethodNotAllowed
+// 			answer.Message = http.StatusText(answer.Code)
+// 			answer.Info = nil
+// 			json.NewEncoder(w).Encode(answer)
+// 			return
+// 		}
+// 		err := json.NewDecoder(r.Body).Decode(&user)
+// 		if err != nil {
+// 			answer.Code = http.StatusBadRequest
+// 			answer.Message = http.StatusText(answer.Code)
+// 			answer.Info = nil
+// 			json.NewEncoder(w).Encode(answer)
+// 			return
+// 		}
+// 		err := c.srv.UpdateUserStatus()
+// 		if err != nil {
+// 			answer.Code = http.StatusInternalServerError
+// 			answer.Message = http.StatusText(answer.Code)
+// 			answer.Info = nil
+// 			json.NewEncoder(w).Encode(answer)
+// 			return
+// 		}
+// 		str := strconv.FormatInt(count, 10)
+// 		answer.Code = http.StatusOK
+// 		answer.Message = http.StatusText(answer.Code)
+// 		answer.Info = str
+// 		json.NewEncoder(w).Encode(str)
+// 	}
+// }
 
 func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +147,7 @@ func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 
 		switch r.Method {
 		case "GET":
-			http.ServeFile(w, r, "C:/Projects/Go/src/github.com/AlifElectronicQueue/web/template/login.html")
+			http.ServeFile(w, r, "C:/Projects/Go/src/github.com/AlifElectronicQueue/web/template/login.html") //!
 		case "POST":
 
 			//********AUTHENTICATION PROCESS*********//
@@ -91,9 +155,7 @@ func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 			var login types.AdminAuth
 			login.Login = r.FormValue("username")
 			login.PasswordHash = r.FormValue("password")
-			fmt.Println(login)
 			answer := c.srv.Authenticate(login)
-			fmt.Println("auth here", answer)
 
 			if answer {
 				//*****AUTHENTICATED******//
@@ -114,14 +176,12 @@ func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 
 				//w.Write([]byte(session.Values["userid"]))
 
-				session.Save(r, w)
-				// if err != nil {
-
-				// 	fmt.Println("problem save")
-
-				// 	http.Error(w, err.Error(), 500)
-				// 	return
-				// }
+				err = session.Save(r, w)
+				if err != nil {
+					fmt.Println("problem save")
+					http.Error(w, err.Error(), 500)
+					return
+				}
 				//w.Write([]byte(session.Values["userid"]))
 
 				//Redirect
@@ -138,7 +198,10 @@ func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 func (c *AuthenticationControllers) AdminLogout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		session, _ := store.Get(r, "session")
+		session, err := store.Get(r, "session")
+		if err != nil {
+			http.Error(w, "session failed", http.StatusInternalServerError)
+		}
 		//Only Post Method
 
 		// Revoke users authentication

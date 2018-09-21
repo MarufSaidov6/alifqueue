@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,16 +34,30 @@
         <div class="row">
             <div class="table-responsive mt-2 mx-auto ">
                 <table class="table ">
+
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="row">id</th>
+                            
                             <th scope="row">FullName</th>
-                            <th scope="row">PhoneNumber</th>
+                            <th scope="row">Contact</th>
                             <th scope="row">SerialNumber</th>
-                            <th scope="row">Services</th>
-                            <th scope="row">SetDate</th>
+                            <th scope="row">PurchaseDateTime</th>
+                            <th scope="row">Status</th>
                         </tr>
                     </thead>
+                    <tbody>
+                            {{ range . }}
+                            <tr>
+                                
+                                <td>{{ .FullName }}</td>
+                                <td>{{ .Contact }}</td>
+                                <td>{{ .SerialNumber }}</td>
+                                <td>{{ .PurchaseDateTime }}</td>
+                                <td>{{ .Сhecked }}</td>
+                            </tr>
+                            {{ end }}
+                            </tbody>
+
                 </table>
             </div>  
         </div>           
