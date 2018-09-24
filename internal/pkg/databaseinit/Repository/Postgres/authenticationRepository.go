@@ -38,48 +38,14 @@ func (repo *AuthenticationRepository) InsertUser(user types.UserAuth) error {
 
 	query = `insert into application_service values($1,$2)`
 
-	if user.Services.None {
-		_, err = tx.Exec(query, txId, 0)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		tx.Commit()
-		return nil
-	}
-
-	if user.Services.Installment {
-		_, err = tx.Exec(query, txId, 1)
+	for _, Services := range user.Services {
+		_, err = tx.Exec(query, txId, Services)
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
 
-	if user.Services.Deposite {
-		_, err = tx.Exec(query, txId, 2)
-
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	if user.Services.CreditCard {
-		_, err = tx.Exec(query, txId, 3)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	if user.Services.UsingApi {
-		_, err = tx.Exec(query, txId, 4)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
 	tx.Commit()
 	return nil
 }
@@ -107,6 +73,86 @@ func (repo *AuthenticationRepository) GetPersons() ([]types.GetUsers, error) {
 	fmt.Println(output)
 	return output, err
 }
+
+func (repo *AuthenticationRepository) GetPersonsOrdered(ordered int) ([]types.GetUsers, error) {
+	var (
+		rows   *sql.Rows
+		err    error
+		output []types.GetUsers
+		input  types.GetUsers
+	)
+	fmt.Println(ordered, "lllllllll")
+	//?Changed ID
+
+	query := fmt.Sprintf("select fullname,contact,serialnumber,purchasedate,checked from application order by %d", ordered)
+
+	rows, err = repo.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(rows)
+	for rows.Next() {
+		err = rows.Scan(&input.FullName, &input.Contact, &input.SerialNumber, &input.PurchaseDateTime, &input.Сhecked)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, input)
+	}
+	fmt.Println("check", output)
+	return output, err
+}
+
+func (repo *AuthenticationRepository) GetPersonById(id int) ([]types.GetUsers, error) {
+	var (
+		query  = `SELECT fullname,contact,serialnumber,purchasedate,checked FROM application WHERE id = $1;`
+		output []types.GetUsers
+		input  types.GetUsers
+		err    error
+		rows   *sqlx.Rows
+	)
+	rows, _ = repo.DB.Queryx(query, id)
+	for rows.Next() {
+		err = rows.Scan(&input.FullName, &input.Contact, &input.SerialNumber, &input.PurchaseDateTime, &input.Сhecked)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, input)
+	}
+	return output, err
+}
+
+func (repo *AuthenticationRepository) GetPersonByContact(contact string) ([]types.GetUsers, error) {
+	var (
+		query  = `SELECT fullname,contact,serialnumber,purchasedate,checked FROM application WHERE contact = $1;`
+		output []types.GetUsers
+		input  types.GetUsers
+		err    error
+		rows   *sqlx.Rows
+	)
+	rows, _ = repo.DB.Queryx(query, contact)
+	for rows.Next() {
+		err = rows.Scan(&input.FullName, &input.Contact, &input.SerialNumber, &input.PurchaseDateTime, &input.Сhecked)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, input)
+	}
+	fmt.Println("heeeeeee", output)
+	return output, err
+}
+
+// func (repo *AuthenticationRepository) GetPersonByContact(id int) ([]types.GetUsers, error) {
+// 	var (
+// 		query  = `SELECT fullname,contact,serialnumber,purchasedate,checked FROM application WHERE contact = $1;`
+// 		output []types.GetUsers
+// 		input  types.GetUsers
+// 		err    error
+// 		row    *sql.Row
+// 	)
+// 	row = repo.DB.QueryRow(query, id)
+// 	err = row.Scan(&input.FullName, &input.Contact, &input.SerialNumber, &input.PurchaseDateTime, &input.Сhecked)
+// 	return output, err
+// }
 
 //
 // func (repo *AuthenticationRepository) UpdateServiceProvider(status *bool, id int) (err error) {

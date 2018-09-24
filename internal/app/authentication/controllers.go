@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 
 	"github.com/AlifElectronicQueue/internal/pkg/types"
 	// _ "github.com/AlifElectronicQueue/web/template"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 )
 
@@ -88,11 +90,113 @@ func (c *AuthenticationControllers) SelectUsers() http.HandlerFunc {
 		}
 
 		users, err := c.srv.repo.GetPersons()
-		fmt.Println("check,", users)
 		if err != nil {
 			fmt.Println("Smth wrong in conntr->", err)
 		}
 		err = templates.ExecuteTemplate(w, "admin.html", users)
+		if err != nil {
+			fmt.Println(err)
+		}
+		//err = json.NewEncoder(w).Encode(users)
+		// if err != nil {
+		// 	panic(err)
+		// }
+	}
+}
+
+func (c *AuthenticationControllers) OrderedApplication() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// w.Header().Set("Content-Type", "application/json")
+		params := mux.Vars(r)
+		order, _ := strconv.Atoi(params["order"])
+		//templates.ExecuteTemplate(w, "admin.html", "newusers")
+		session, err := store.Get(r, "session")
+		fmt.Println("store", store)
+		if err != nil {
+
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		users, err := c.srv.repo.GetPersonsOrdered(order)
+		if err != nil {
+			fmt.Println("Smth wrong in conntr->", err)
+		}
+		fmt.Println("ttt", users)
+		err = templates.ExecuteTemplate(w, "admin.html", users)
+		if err != nil {
+			fmt.Println(err)
+		}
+		//err = json.NewEncoder(w).Encode(users)
+		// if err != nil {
+		// 	panic(err)
+		// }
+	}
+}
+
+func (c *AuthenticationControllers) SelectUserById() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		params := mux.Vars(r)
+		id, _ := strconv.Atoi(params["id"])
+
+		session, err := store.Get(r, "session")
+		fmt.Println("store", store)
+		if err != nil {
+
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		user, err := c.srv.repo.GetPersonById(id)
+		if err != nil {
+			fmt.Println("Smth wrong in conntr->", err)
+		}
+		err = templates.ExecuteTemplate(w, "admin.html", user)
+		if err != nil {
+			fmt.Println(err)
+		}
+		//err = json.NewEncoder(w).Encode(users)
+		// if err != nil {
+		// 	panic(err)
+		// }
+	}
+}
+
+func (c *AuthenticationControllers) SelectUserByContact() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		params := mux.Vars(r)
+		contact := params["contact"]
+		session, err := store.Get(r, "session")
+		fmt.Println("store", store)
+		if err != nil {
+
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		fmt.Println("Whh")
+		user, err := c.srv.repo.GetPersonByContact(contact)
+		fmt.Println("check ID,", user)
+		if err != nil {
+			fmt.Println("Smth wrong in conntr->", err)
+		}
+		err = templates.ExecuteTemplate(w, "admin.html", user)
 		if err != nil {
 			fmt.Println(err)
 		}

@@ -10,21 +10,22 @@ type DBData struct {
 
 //!STORE USER
 type UserAuth struct {
-	Id               int      `json:"id"`
-	FullName         string   `json:"FIO"`
-	Contact          string   `json:"Contact"`
-	SerialNumber     string   `json:"SerialNumber"`
-	RegistrationDate string   `json:"Registrationdate"`
-	PurchaseDateTime string   `json:"PurchaseDateTime"`
-	Services         Services `json:"Services"`
+	Id               int    `json:"id"`
+	FullName         string `json:"FIO"`
+	Contact          string `json:"Contact"`
+	SerialNumber     string `json:"SerialNumber"`
+	RegistrationDate string `json:"Registrationdate"`
+	PurchaseDateTime string `json:"PurchaseDateTime"`
+	Services         []int  `json:"Services"`
 }
-type Services struct {
-	Installment bool `json:"nasiya"`
-	Deposite    bool `json:"Installment"`
-	CreditCard  bool `json:"CreditCard"`
-	UsingApi    bool `json:"UsingApi"`
-	None        bool `json:"None"`
-}
+
+// type Services struct {
+// 	Installment bool `json:"nasiya"`
+// 	Deposite    bool `json:"Installment"`
+// 	CreditCard  bool `json:"CreditCard"`
+// 	UsingApi    bool `json:"UsingApi"`
+// 	None        bool `json:"None"`
+// }
 
 //!GET USERS
 type GetUsers struct {
