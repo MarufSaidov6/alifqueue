@@ -16,7 +16,7 @@ type UserAuth struct {
 	SerialNumber     string `json:"SerialNumber"`
 	RegistrationDate string `json:"Registrationdate"`
 	PurchaseDateTime string `json:"PurchaseDateTime"`
-	Services         []int  `json:"Services"`
+	Services         []int  `json:"Services"` //! sql:"default: false"
 }
 
 // type Services struct {
@@ -33,7 +33,7 @@ type GetUsers struct {
 	Contact          string `json:"Contact"`
 	SerialNumber     string `json:"SerialNumber"`
 	PurchaseDateTime string `json:"PurchaseDateTime"`
-	Сhecked          bool   `json:"Checked"` //!ATTENTION!
+	Сhecked          bool   `json:"Checked" schema:"my_field"` //!ATTENTION!
 }
 
 //!

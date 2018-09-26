@@ -44,6 +44,10 @@ func main() {
 	router.HandleFunc("/admin/applications/{contact}", authMiddle.RequiresLogin(authContrl.SelectUserByContact())).Queries("getby", "contact").Methods("GET") //TODO:Middleware->SecretPage*
 
 	router.HandleFunc("/admin/applications/", authMiddle.RequiresLogin(authContrl.OrderedApplication())).Queries("orderby", "{order}").Methods("GET")
+
+	//router.HandleFunc("/admin/applications/update/{id:0-9}", authMiddle.RequiresLogin(authContrl.OrderedApplication())).Queries("orderby", "{order}").Methods("GET")
+	//
+
 	//router.HandleFunc("/admin/applications/users", authContrl.SelectUsers()).Methods("GET")      //!CHECK
 
 	router.HandleFunc("/", authContrl.Application())
