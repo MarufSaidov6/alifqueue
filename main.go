@@ -32,26 +32,21 @@ func main() {
 	//!------------------------------------------------------
 	router.PathPrefix("/web/static/").Handler(http.StripPrefix("/web/static/", http.FileServer(http.Dir("./web/static/"))))
 	//!--------------------------------------------------/
-	//router.HandleFunc("/")
+	router.HandleFunc("/", authContrl.Application())
+	//!!!
 	router.HandleFunc("/login", authContrl.AdminLogin()).Methods("GET")
 	router.HandleFunc("/login", authContrl.AdminLogin()).Methods("POST") //TODO:Authentication Process
-
-	router.HandleFunc("/logout", authMiddle.RequiresLogin(authContrl.AdminLogout())).Methods("POST") //TODO: Destroy COOKIE
-
-	router.HandleFunc("/admin/applications", authMiddle.RequiresLogin(authContrl.SelectUsers())) //TODO:Middleware->SecretPage*
-	//!!!!!!!!!!!!!!!!!!!!!!!ASK SENIOR
-	router.HandleFunc("/admin/applications/{id:[0-9]+}", authMiddle.RequiresLogin(authContrl.SelectUserById())).Methods("GET")                                //TODO:Middleware->SecretPage*
+	//!
+	router.HandleFunc("/logout", authMiddle.RequiresLogin(authContrl.AdminLogout())).Methods("POST")                                                          //TODO: Destroy COOKIE
+	router.HandleFunc("/admin/applications", authMiddle.RequiresLogin(authContrl.SelectUsers()))                                                              //TODO:Middleware->SecretPage*
+	router.HandleFunc("/admin/applications/{id}", authMiddle.RequiresLogin(authContrl.SelectUserById())).Methods("GET")                                       //TODO:Middleware->SecretPage*
+	router.HandleFunc("/admin/applications/{contact}", authMiddle.RequiresLogin(authContrl.SelectUserByContact())).Queries("getby", "contact").Methods("GET") //TODO:Middleware->SecretPage*
+	router.HandleFunc("/admin/applications/", authMiddle.RequiresLogin(authContrl.OrderedApplication())).Queries("orderby", "{order}").Methods("GET")
 	router.HandleFunc("/admin/applications/{contact}", authMiddle.RequiresLogin(authContrl.SelectUserByContact())).Queries("getby", "contact").Methods("GET") //TODO:Middleware->SecretPage*
 
-	router.HandleFunc("/admin/applications/", authMiddle.RequiresLogin(authContrl.OrderedApplication())).Queries("orderby", "{order}").Methods("GET")
+	//TODO: UPDATE
+	router.HandleFunc("/admin/applications/update/{id:[0-9]+}", authMiddle.RequiresLogin(authContrl.UpdateApplicationById())).Methods("POST")
 
-	//router.HandleFunc("/admin/applications/update/{id:0-9}", authMiddle.RequiresLogin(authContrl.OrderedApplication())).Queries("orderby", "{order}").Methods("GET")
-	//
-
-	//router.HandleFunc("/admin/applications/users", authContrl.SelectUsers()).Methods("GET")      //!CHECK
-
-	router.HandleFunc("/", authContrl.Application())
-	// router.HandleFunc("/admin/applications", authMiddle.RequiresLogin(authContrl.Application()))//.Methods("POST")
 	//!--------------------------------------------------/
 	log.Info("Starting http server...")
 	http.ListenAndServe(":80", router)

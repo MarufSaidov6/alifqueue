@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="/web/static/styles_admin.css">
+    <title>Document</title>
+</head>
+<body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+                <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/applications">Applications</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Analytics</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mx-auto order-0">
+                    <h4 class="navbar-brand mx-auto">AlifQueue</h4>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+                    <ul class="navbar-nav ml-auto">
+
+                        <li class="nav-item">
+                                <form class="logout-form"action="/logout" method="POST">
+                                    <button type="submit" class="btn btn-default btn-sm">
+                                            <span class="glyphicon glyphicon-log-out">Log out</span> 
+                                    </button>
+                                </form>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+       
+    {{ range . }}
+    <form class="login-form" action="/admin/applications/update/{{.Id}}" method="POST">
+
+        <div class="container mt-4">
+            <!-- Table Row -->
+            <div class="row">
+                <div class="table-responsive mt-2 mx-auto ">
+                    <table class="table ">
+                        <thead class="thead-dark">
+                            <tr>
+                                
+                                <th scope="row">FullName</th>
+                                <th scope="row">Contact</th>
+                                <th scope="row">SerialNumber</th>
+                                <th scope="row">PurchaseDateTime</th>
+                                <th scope="row">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                
+                                <tr>
+                                    
+                                    <td>{{ .FullName }}</td>
+                                    <td>{{ .Contact }}</td>
+                                    <td>{{ .SerialNumber }}</td>
+                                    <td>{{ .PurchaseDateTime }}</td>
+                                    <td> 
+                                        <div class="checkbox">
+                                            <label><input type="checkbox" name="my_field" type="checkbox" {{if .Сhecked}}checked{{end}}></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                </tbody>
+
+                    </table>
+                </div>  
+            </div>   
+            <div class="row">
+                <div class="col float-right">
+                        <button type="submit" class="btn btn-primary pull-right float-right" value="Save">Save</button>
+                </div>
+            </div>        
+        </div>
+        
+    </form>
+    {{ end }}
+</body>
+</html>

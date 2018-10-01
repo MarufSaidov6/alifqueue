@@ -9,5 +9,5 @@ type IAuthenticationRepository interface {
 	GetPersonById(id int) ([]GetUsers, error)
 	GetPersonByContact(contact string) ([]GetUsers, error)
 	GetPersonsOrdered(ordered int) ([]GetUsers, error)
-	// UpdateServiceProvider(status *bool, id int) (err error)
+	UpdateApplicationStatusById(checked string, id int) (err error)
 }

@@ -27,6 +27,9 @@ func (srv *AuthenticationService) CreateUser(user types.UserAuth) error {
 	//TODO: ADD PURCHASEDATE
 	user.PurchaseDateTime = currentTime.Add(time.Hour * 24 * 3).Format(layout)
 
+	//P12345678
+	//A12345678
+	//RT23456Y7
 	//!VALIDATION PROCESS!!!
 	//TODO: "A" may be cyrillic!
 	xbytes := []rune(user.SerialNumber)

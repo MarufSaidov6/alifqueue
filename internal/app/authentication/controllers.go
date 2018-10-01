@@ -26,8 +26,9 @@ func InitControllers(asrv *AuthenticationService) *AuthenticationControllers {
 //var emailVal = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,255}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,255}[a-zA-Z0-9])?)*$")
 
 var templates = template.Must(template.ParseFiles(
-	"C:/Projects/Go/src/github.com/AlifElectronicQueue/web/template/login.html",
-	"C:/Projects/Go/src/github.com/AlifElectronicQueue/web/template/admin.html",
+	"./web/template/login.html",
+	"./web/template/admin.html",
+	"./web/template/update.html",
 ))
 
 // key must be 16, 24 or 32 bytes long (AES-128, AES-192 or AES-256)
@@ -59,18 +60,6 @@ func (c *AuthenticationControllers) Application() http.HandlerFunc {
 	}
 }
 
-// func initSession(r *http.Request) *sessions.Session {
-// 	session, err := store.Get(r, "session")
-// 	if err != nil {
-// 		fmt.Println("Check initsession")
-// 	}
-// 	if session.IsNew {
-// 		session.Options.Domain = "localhost"
-// 		session.Options.HttpOnly = false
-// 		session.Options.Secure = true
-// 	}
-// 	return session
-// }
 func (c *AuthenticationControllers) SelectUsers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// w.Header().Set("Content-Type", "application/json")
@@ -106,10 +95,8 @@ func (c *AuthenticationControllers) SelectUsers() http.HandlerFunc {
 
 func (c *AuthenticationControllers) OrderedApplication() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// w.Header().Set("Content-Type", "application/json")
 		params := mux.Vars(r)
 		order, _ := strconv.Atoi(params["order"])
-		//templates.ExecuteTemplate(w, "admin.html", "newusers")
 		session, err := store.Get(r, "session")
 		fmt.Println("store", store)
 		if err != nil {
@@ -132,10 +119,7 @@ func (c *AuthenticationControllers) OrderedApplication() http.HandlerFunc {
 		if err != nil {
 			fmt.Println(err)
 		}
-		//err = json.NewEncoder(w).Encode(users)
-		// if err != nil {
-		// 	panic(err)
-		// }
+
 	}
 }
 
@@ -162,14 +146,39 @@ func (c *AuthenticationControllers) SelectUserById() http.HandlerFunc {
 		if err != nil {
 			fmt.Println("Smth wrong in conntr->", err)
 		}
-		err = templates.ExecuteTemplate(w, "admin.html", user)
+		fmt.Println(user, "here")
+		err = templates.ExecuteTemplate(w, "update.html", user)
 		if err != nil {
 			fmt.Println(err)
 		}
-		//err = json.NewEncoder(w).Encode(users)
-		// if err != nil {
-		// 	panic(err)
-		// }
+
+	}
+}
+
+func (c *AuthenticationControllers) UpdateApplicationById() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		params := mux.Vars(r)
+		id, _ := strconv.Atoi(params["id"])
+		status := r.PostFormValue("my_field")
+
+		session, err := store.Get(r, "session")
+		if err != nil {
+
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		err = c.srv.repo.UpdateApplicationStatusById(status, id)
+		if err != nil {
+			fmt.Println("Update Error:", err)
+		}
+		http.Redirect(w, r, "/admin/applications", 302)
+
 	}
 }
 
@@ -200,58 +209,16 @@ func (c *AuthenticationControllers) SelectUserByContact() http.HandlerFunc {
 		if err != nil {
 			fmt.Println(err)
 		}
-		//err = json.NewEncoder(w).Encode(users)
-		// if err != nil {
-		// 	panic(err)
-		// }
+
 	}
 }
 
-// func (c *AuthenticationControllers) Update() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		w.Header().Set("Content-Type", "application/json")
-// 		var (
-// 			user   types.GetUsers
-// 			answer types.Answer
-// 		)
-// 		if r.Method != http.MethodPut {
-// 			answer.Code = http.StatusMethodNotAllowed
-// 			answer.Message = http.StatusText(answer.Code)
-// 			answer.Info = nil
-// 			json.NewEncoder(w).Encode(answer)
-// 			return
-// 		}
-// 		err := json.NewDecoder(r.Body).Decode(&user)
-// 		if err != nil {
-// 			answer.Code = http.StatusBadRequest
-// 			answer.Message = http.StatusText(answer.Code)
-// 			answer.Info = nil
-// 			json.NewEncoder(w).Encode(answer)
-// 			return
-// 		}
-// 		err := c.srv.UpdateUserStatus()
-// 		if err != nil {
-// 			answer.Code = http.StatusInternalServerError
-// 			answer.Message = http.StatusText(answer.Code)
-// 			answer.Info = nil
-// 			json.NewEncoder(w).Encode(answer)
-// 			return
-// 		}
-// 		str := strconv.FormatInt(count, 10)
-// 		answer.Code = http.StatusOK
-// 		answer.Message = http.StatusText(answer.Code)
-// 		answer.Info = str
-// 		json.NewEncoder(w).Encode(str)
-// 	}
-// }
-
 func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//w.Header().Set("Content-Type", "text/html")
 
 		switch r.Method {
 		case "GET":
-			http.ServeFile(w, r, "C:/Projects/Go/src/github.com/AlifElectronicQueue/web/template/login.html") //!
+			http.ServeFile(w, r, "./web/template/login.html") //!
 		case "POST":
 
 			//********AUTHENTICATION PROCESS*********//
@@ -259,15 +226,14 @@ func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 			var login types.AdminAuth
 			login.Login = r.FormValue("username")
 			login.PasswordHash = r.FormValue("password")
-			answer := c.srv.Authenticate(login)
 
-			if answer {
-				//*****AUTHENTICATED******//
-
+			auth := c.srv.Authenticate(login)
+			if auth {
 				//*TODO:SET SESSION
 				session, err := store.Get(r, "session")
 				if err != nil {
-					fmt.Println("Check initsession")
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
 				}
 
 				//*TODO:SET SESSION STATUS
@@ -282,13 +248,10 @@ func (c *AuthenticationControllers) AdminLogin() http.HandlerFunc {
 
 				err = session.Save(r, w)
 				if err != nil {
-					fmt.Println("problem save")
 					http.Error(w, err.Error(), 500)
 					return
 				}
-				//w.Write([]byte(session.Values["userid"]))
 
-				//Redirect
 				http.Redirect(w, r, "/admin/applications", 302)
 
 			} else {
@@ -306,7 +269,6 @@ func (c *AuthenticationControllers) AdminLogout() http.HandlerFunc {
 		if err != nil {
 			http.Error(w, "session failed", http.StatusInternalServerError)
 		}
-		//Only Post Method
 
 		// Revoke users authentication
 		session.Values["authenticated"] = false

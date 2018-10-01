@@ -29,11 +29,12 @@ type UserAuth struct {
 
 //!GET USERS
 type GetUsers struct {
+	Id               int    `json:"Id"`
 	FullName         string `json:"FullName"`
 	Contact          string `json:"Contact"`
 	SerialNumber     string `json:"SerialNumber"`
 	PurchaseDateTime string `json:"PurchaseDateTime"`
-	Сhecked          bool   `json:"Checked" schema:"my_field"` //!ATTENTION!
+	Сhecked          bool   `json:"Checked" schema:"my_field" sql:"default: false"` //!ATTENTION!
 }
 
 //!
